@@ -1,0 +1,15 @@
+
+fastapi
+uvicorn
+python-dotenv
+requests
+langchain
+langgraph
+langchain-core
+langchain-openai  
+openai
+pydantic
+pydantic-settings 
+tenacity
+ruff
+black

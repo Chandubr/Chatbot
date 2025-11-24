@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+*.pdb
+*.egg-info/
+venv/
+.env
+.env.*
+
+# Node
+node_modules/
+dist/
+build/
+.env.local
+.env.development
+.env.production
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Test
+coverage/
+
+# Misc
+*.sqlite3
+*.db
+
+# Ignore frontend build artifacts
+Frontend/my-app/.next/
+Frontend/my-app/out/
+Frontend/my-app/.turbo/
+Frontend/my-app/.cache/
