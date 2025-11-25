@@ -1,12 +1,19 @@
-# Entry point for your backend app
-# Example for FastAPI:
-# from fastapi import FastAPI
-# app = FastAPI()
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from app.routers import chat
 
-# Example for Flask:
-# from flask import Flask
-# app = Flask(__name__)
+app = FastAPI()
 
-if __name__ == "__main__":
-    # app.run() or uvicorn main:app --reload
-    pass
+app.include_router(chat.router)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {"message": "Chatbot backend is running"}
