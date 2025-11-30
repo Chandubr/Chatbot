@@ -1,29 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import "../../assets/styles/chatbot.css";
 import { BsSend } from "react-icons/bs";
-import { useDispatch, useSelector } from "react-redux";
-import { setMessage } from "./chatslice";
 
-const MessageInput = () => {
-  const dispatch = useDispatch();
-  const now = new Date();
+const MessageInput = ({onSend}) => {
   const [inputValue, setInputValue] = useState("");
-  const messages = useSelector((state) => state.chat.messages);
-  const timeString = now.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
   const sendMessage = () => {
-    const newMessages = [
-      ...messages,
-      {
-        text: inputValue,
-        sender: "user",
-        timestamp: timeString,
-      },
-    ];
-    dispatch(setMessage(newMessages));
+    onSend(inputValue);
     setInputValue("");
 
   };
