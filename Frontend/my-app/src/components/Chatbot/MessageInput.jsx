@@ -2,13 +2,12 @@ import React, { useState } from "react";
 import "../../assets/styles/chatbot.css";
 import { BsSend } from "react-icons/bs";
 
+
 const MessageInput = ({onSend}) => {
   const [inputValue, setInputValue] = useState("");
-
   const sendMessage = () => {
     onSend(inputValue);
     setInputValue("");
-
   };
   return (
     <div className="messageInput">
