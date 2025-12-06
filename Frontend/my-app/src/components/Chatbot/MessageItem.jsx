@@ -11,7 +11,7 @@ const MessageItem = ({ message }) => {
                 <span className="sender-label">{sender === 'ai' ? <RiRobot3Fill /> : <FaUser />}</span>
             </div>
             <div className="message-content">
-                {text.trim()}
+                {text?.trim()}
             </div>
             {timestamp && <span className="timestamp">{timestamp}</span>}
         </div>

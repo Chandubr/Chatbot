@@ -12,9 +12,12 @@ const chatSlice = createSlice({
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
-    }
+    },
+    clearMessages: (state) => {
+      state.messages = [];
+    },
   },
 });
 
-export const { setMessage ,setLoading} = chatSlice.actions;
+export const { setMessage, setLoading, clearMessages } = chatSlice.actions;
 export default chatSlice.reducer;
