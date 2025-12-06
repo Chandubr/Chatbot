@@ -1,5 +1,6 @@
 import logging
 import os
+from logging.handlers import RotatingFileHandler
 
 LOG_FORMAT = "%(asctime)s | %(levelname)s | %(name)s | %(filename)s:%(lineno)d | %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
@@ -9,8 +10,8 @@ def setup_logging():
     logger.setLevel(logging.DEBUG)
 
     # Info handler
-    info_handler = logging.FileHandler("info.log")
-    info_handler.setLevel(logging.INFO)
+    info_handler = RotatingFileHandler("info.log", maxBytes=1_000_000, backupCount=1)
+    info_handler.setLevel(logging.DEBUG)
     info_handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
 
     # Error handler

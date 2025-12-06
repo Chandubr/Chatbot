@@ -8,6 +8,9 @@ class EnvConfig(BaseSettings):
     langsmith_tracing: bool = True
     host: str
     port: int
+    mongodb_uri: str
+    mongodb_db: str
+    mongodb_conversations_collection: str 
 
     class Config:
         env_file = ".env"

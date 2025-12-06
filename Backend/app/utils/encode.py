@@ -12,4 +12,3 @@ def decode_key(encoded_key: str) -> str:
     key_bytes = base64.b64decode(encoded_bytes)
     return key_bytes.decode('utf-8')
 
-print(encode_key("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"))

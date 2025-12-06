@@ -16,8 +16,6 @@ async def get_bot_response(user_message: list,timeout_sec=15) -> str:
 		user_question=user_message[-1].content
 		messages = get_generate_answer_prompt().format_messages(question=user_question,history=user_message[:-1])
 		response = await asyncio.wait_for(llm.ainvoke(messages), timeout=timeout_sec)
-		logger.info(f"User message: {user_message}")
-		logger.info(f"Bot response: {response.content}")
 		return response.content
 	except asyncio.TimeoutError as e:
 		logger.error(f"Timeout getting bot response: {e}")

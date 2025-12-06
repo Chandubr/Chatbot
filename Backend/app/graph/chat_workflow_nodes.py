@@ -13,7 +13,6 @@ def add_user_message(state: ChatState) -> ChatState:
         logger.info(f"Adding user message: {updated_state['new_message']}")
         updated_state.setdefault("messages", []).append(updated_state["new_message"])
         updated_state["new_message"] = None
-    logger.debug(f"State after add_user_message: {updated_state}")
     return updated_state
 
 async def generate_answer(state: ChatState) -> ChatState:
@@ -23,5 +22,4 @@ async def generate_answer(state: ChatState) -> ChatState:
     updated_state = dict(state)
     updated_state["answer"] = answer
     logger.info(f"Generated answer: {answer}")
-    logger.debug(f"State after generate_answer: {updated_state}")
     return updated_state
