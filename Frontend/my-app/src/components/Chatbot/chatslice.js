@@ -5,6 +5,7 @@ const chatSlice = createSlice({
   initialState: {
     messages: [],
     loading: false,
+    sessionId: null,
   },
   reducers: {
     setMessage: (state, action) => {
@@ -16,8 +17,11 @@ const chatSlice = createSlice({
     clearMessages: (state) => {
       state.messages = [];
     },
+    setSessionId: (state, action) => {
+      state.sessionId = action.payload;
+    },
   },
 });
 
-export const { setMessage, setLoading, clearMessages } = chatSlice.actions;
+export const { setMessage, setLoading, clearMessages, setSessionId } = chatSlice.actions;
 export default chatSlice.reducer;

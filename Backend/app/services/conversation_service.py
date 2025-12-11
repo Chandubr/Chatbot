@@ -2,12 +2,10 @@ from datetime import datetime
 from typing import List
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from app.core.logging import logger
-from app.db.database import get_conversation_collection
 
 
-async def get_history_messages(session_id: str) -> List[BaseMessage]:
+async def get_history_messages(collection, session_id: str) -> List[BaseMessage]:
     """Fetch chat history for a session and convert it into LangChain messages."""
-    collection = get_conversation_collection()
     cursor = collection.find({"session_id": session_id}).sort("created_at", 1)
     documents = await cursor.to_list(length=None)
 
@@ -21,60 +19,72 @@ async def get_history_messages(session_id: str) -> List[BaseMessage]:
         elif role == "assistant":
             msg = AIMessage(content=content)
         else:
-            continue 
+            continue
         msg.created_at = created_at
         history.append(msg)
-
-    logger.debug(f"Loaded {len(history)} messages from MongoDB for session_id={session_id}")
     return history
 
-
-async def save_conversation_turn(session_id: str, user_message: HumanMessage, bot_response: str) -> None:
-    """Persist the latest user/bot messages for a session."""
+async def save_conversation_turn(
+    collection, session_id: str, user_message: HumanMessage, bot_response: str
+) -> None:
+    """Persist the latest user/bot messages for a session, including title if present."""
     now = datetime.utcnow()
-    collection = get_conversation_collection()
-    await collection.insert_many(
-        [
-            {
-                "session_id": session_id,
-                "role": "user",
-                "content": user_message.content,
-                "created_at": now,
-            },
-            {
-                "session_id": session_id,
-                "role": "assistant",
-                "content": bot_response,
-                "created_at": now,
-            },
-        ]
+    latest_doc = await collection.find_one(
+        {"session_id": session_id, "title": {"$exists": True}},
+        sort=[("created_at", -1)]
     )
-    logger.debug(f"Stored conversation turn in MongoDB for session_id={session_id}")
+    title = latest_doc["title"] if latest_doc and "title" in latest_doc else None
+
+    user_doc = {
+        "session_id": session_id,
+        "role": "user",
+        "content": user_message.content,
+        "created_at": now,
+    }
+    assistant_doc = {
+        "session_id": session_id,
+        "role": "assistant",
+        "content": bot_response,
+        "created_at": now,
+    }
+    if title:
+        user_doc["title"] = title
+        assistant_doc["title"] = title
+
+    await collection.insert_many([user_doc, assistant_doc])
 
 
-async def get_all_session_ids() -> List[str]:
-    """Return all unique session IDs that have stored messages."""
-    collection = get_conversation_collection()
+async def get_all_session_ids(collection) -> List[dict]:
+    """Return all unique session IDs and their latest title."""
     pipeline = [
+        {"$sort": {"created_at": -1}},  
         {"$group": {
             "_id": "$session_id",
-            "latest_time": {"$max": "$created_at"}
+            "latest_time": {"$max": "$created_at"},
+            "title": {"$first": "$title"}
         }},
         {"$sort": {"latest_time": -1}}
     ]
-    session_ids = await collection.aggregate(pipeline).to_list(length=None)
-    session_ids = [doc["_id"] for doc in session_ids]
-    logger.debug(f"Found {len(session_ids)} unique session_ids in MongoDB")
-    return session_ids
+    session_docs = await collection.aggregate(pipeline).to_list(length=None)
+    sessions = [{"id": doc["_id"], "title": doc.get("title", f"Conversation {doc['_id']}")} for doc in session_docs]
+    return sessions
 
-
-async def delete_conversation_by_session_id(session_id: str) -> int:
+async def delete_conversation_by_session_id(collection, session_id: str) -> int:
     """
     Delete all messages for a given session_id.
     Returns the number of deleted documents.
     """
-    collection = get_conversation_collection()
     result = await collection.delete_many({"session_id": session_id})
     logger.info(f"Deleted {result.deleted_count} messages for session_id={session_id}")
     return result.deleted_count
 
+
+async def rename_conversation_name(collection, session_id: str, new_name: str) -> None:
+    """
+    Rename the conversation by updating the 'title' field
+    for all messages with the given session_id.
+    """
+    await collection.update_many(
+        {"session_id": session_id}, {"$set": {"title": new_name}}
+    )
+    logger.info(f"Renamed conversation {session_id} to '{new_name}'")

@@ -7,13 +7,13 @@ from app.services.conversation_service import (
 )
 
 
-async def bot_reply(user_message: str, session_id: str) -> str:
+async def bot_reply(collection, user_message: str, session_id: str) -> str:
     """
     Process user message and return bot response.
     """
     try:
         try:
-            history_messages = await get_history_messages(session_id)
+            history_messages = await get_history_messages(collection, session_id)
         except Exception as db_error:
             logger.error(f"Failed to load history from MongoDB: {db_error}")
             history_messages = []
@@ -24,11 +24,15 @@ async def bot_reply(user_message: str, session_id: str) -> str:
             "new_message": user_message_obj,
             "session_id": session_id,
         }
-        final_state = await chatbot_graph.ainvoke(initial_state)
+        config = {"configurable": {"thread_id": session_id}}
+        final_state = await chatbot_graph.ainvoke(
+            initial_state,
+            config=config,
+        )
         answer = final_state["answer"]
 
         try:
-            await save_conversation_turn(session_id, user_message_obj, answer)
+            await save_conversation_turn(collection, session_id, user_message_obj, answer)
         except Exception as db_error:
             logger.error(f"Failed to store conversation turn in MongoDB: {db_error}")
 

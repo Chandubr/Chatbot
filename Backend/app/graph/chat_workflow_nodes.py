@@ -10,7 +10,6 @@ from app.core.logging import logger
 def add_user_message(state: ChatState) -> ChatState:
     updated_state = dict(state)
     if "new_message" in updated_state and updated_state["new_message"] is not None:
-        logger.info(f"Adding user message: {updated_state['new_message']}")
         updated_state.setdefault("messages", []).append(updated_state["new_message"])
         updated_state["new_message"] = None
     return updated_state
@@ -21,5 +20,6 @@ async def generate_answer(state: ChatState) -> ChatState:
     answer = await get_bot_response(user_messages)
     updated_state = dict(state)
     updated_state["answer"] = answer
-    logger.info(f"Generated answer: {answer}")
     return updated_state
+
+    

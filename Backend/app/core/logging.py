@@ -7,11 +7,11 @@ DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 def setup_logging():
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     # Info handler
     info_handler = RotatingFileHandler("info.log", maxBytes=1_000_000, backupCount=1)
-    info_handler.setLevel(logging.DEBUG)
+    info_handler.setLevel(logging.INFO)
     info_handler.setFormatter(logging.Formatter(LOG_FORMAT, DATE_FORMAT))
 
     # Error handler
