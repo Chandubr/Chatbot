@@ -6,6 +6,8 @@ Built with **FastAPI**, **React**, **MongoDB**, and **LangChain/LangGraph** for 
 
 > Talk to an AI assistant with web search, multi-turn memory, and session management – all in one app.
 
+![App screenshot](https://github.com/Chandubr/Chatbot/blob/master/Screenshot%202025-12-11%20235628.png)
+
 ---
 
 ## ✨ Features
